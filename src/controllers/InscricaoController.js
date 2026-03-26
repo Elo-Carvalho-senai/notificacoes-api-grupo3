@@ -3,105 +3,124 @@
 const InscricaoModel = require("../models/InscricaoModel");
 const EventoModel = require("../models/EventoModel");
 const ParticipanteModel = require("../models/ParticipanteModel");
+const { NotFoundError, ValidationError } = require("../errors/AppError");
 
 // GET /inscricoes/:id/detalhes
-function detalhes(req, res) {
-    const id = parseInt(req.params.id);
+function detalhes(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
 
-    if (isNaN(id)) {
-        return res.status(400).json({ erro: "ID inválido" });
+        if (isNaN(id)) {
+            throw new ValidationError("ID inválido");
+        }
+
+        const inscricao = InscricaoModel.listar().find(i => i.id === id);
+
+        if (!inscricao) {
+            throw new NotFoundError("Inscrição");
+        }
+
+        const evento = EventoModel.listar().find(e => e.id === inscricao.eventoId);
+
+        const participante = ParticipanteModel.listar().find(
+            p => p.id === inscricao.participanteId
+        );
+
+        const resposta = {
+            id: inscricao.id,
+            status: inscricao.status,
+            dataInscricao: inscricao.dataInscricao || null,
+            evento: evento
+                ? { id: evento.id, nome: evento.nome }
+                : null,
+            participante: participante
+                ? {
+                      id: participante.id,
+                      nome: participante.nome,
+                      email: participante.email
+                  }
+                : null
+        };
+
+        res.json(resposta);
+    } catch (erro) {
+        next(erro);
     }
-
-    const inscricao = InscricaoModel.listar().find(i => i.id === id);
-
-    if (!inscricao) {
-        return res.status(404).json({ erro: "Inscrição não encontrada" });
-    }
-
-    const evento = EventoModel.listar().find(e => e.id === inscricao.eventoId);
-
-    const participante = ParticipanteModel.listar().find(
-        p => p.id === inscricao.participanteId
-    );
-
-    const resposta = {
-        id: inscricao.id,
-        status: inscricao.status,
-        dataInscricao: inscricao.dataInscricao || null,
-        evento: evento
-            ? { id: evento.id, nome: evento.nome }
-            : null,
-        participante: participante
-            ? {
-                  id: participante.id,
-                  nome: participante.nome,
-                  email: participante.email
-              }
-            : null
-    };
-
-    return res.json(resposta);
 }
 
 // POST /inscricoes
-function store(req, res) {
-    const { eventoId, participanteId } = req.body || {};
+function store(req, res, next) {
+    try {
+        const { eventoId, participanteId } = req.body || {};
 
-    if (!eventoId || !participanteId) {
-        return res
-            .status(400)
-            .json({ erro: "eventoId e participanteId são obrigatórios" });
+        if (!eventoId || !participanteId) {
+            throw new ValidationError("eventoId e participanteId são obrigatórios");
+        }
+
+        const resultado = InscricaoModel.criar(
+            parseInt(eventoId),
+            parseInt(participanteId)
+        );
+
+        if (resultado?.erro) {
+            throw new ValidationError(resultado.erro);
+        }
+
+        res.status(201).json(resultado);
+    } catch (erro) {
+        next(erro);
     }
-
-    const resultado = InscricaoModel.criar(
-        parseInt(eventoId),
-        parseInt(participanteId)
-    );
-
-    if (resultado?.erro) {
-        return res.status(400).json(resultado);
-    }
-
-    return res.status(201).json(resultado);
 }
 
 // GET /inscricoes
-function index(req, res) {
-    const inscricoes = InscricaoModel.listar();
-    return res.json(inscricoes);
+function index(req, res, next) {
+    try {
+        const inscricoes = InscricaoModel.listar();
+        res.json(inscricoes);
+    } catch (erro) {
+        next(erro);
+    }
 }
 
 // GET /inscricoes/evento/:eventoId
-function listarPorEvento(req, res) {
-    const eventoId = parseInt(req.params.eventoId);
+function listarPorEvento(req, res, next) {
+    try {
+        const eventoId = parseInt(req.params.eventoId);
 
-    if (isNaN(eventoId)) {
-        return res.status(400).json({ erro: "ID do evento inválido" });
+        if (isNaN(eventoId)) {
+            throw new ValidationError("ID do evento inválido");
+        }
+
+        const inscricoes = InscricaoModel.listarPorEvento(eventoId);
+
+        res.json(inscricoes);
+    } catch (erro) {
+        next(erro);
     }
-
-    const inscricoes = InscricaoModel.listarPorEvento(eventoId);
-
-    return res.json(inscricoes);
 }
 
 // PATCH /inscricoes/:id/cancelar
-function cancelar(req, res) {
-    const id = parseInt(req.params.id);
+function cancelar(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
 
-    if (isNaN(id)) {
-        return res.status(400).json({ erro: "ID inválido" });
+        if (isNaN(id)) {
+            throw new ValidationError("ID inválido");
+        }
+
+        const inscricao = InscricaoModel.cancelar(id);
+
+        if (!inscricao) {
+            throw new NotFoundError("Inscrição");
+        }
+
+        res.json({
+            mensagem: "Inscrição cancelada com sucesso!",
+            inscricao
+        });
+    } catch (erro) {
+        next(erro);
     }
-
-    const inscricao = InscricaoModel.cancelar(id);
-
-    if (!inscricao) {
-        return res.status(404).json({ erro: "Inscrição não encontrada" });
-    }
-
-    return res.json({
-        mensagem: "Inscrição cancelada com sucesso!",
-        inscricao
-    });
 }
 
 module.exports = { store, index, listarPorEvento, cancelar, detalhes };
