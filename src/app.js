@@ -5,6 +5,7 @@ const swaggerSpec = require("./swagger");
 const app = express();
 const cors = require("cors");
 const responseTime = require("./middlewares/responseTime");
+const errorHandler = require("./middlewares/errorHandler");
 // ... todas as rotas acima ...
 // Middleware de rota não encontrada (sempre por último!)
 const notFound = require("./middlewares/notFound");
@@ -36,4 +37,6 @@ app.get("/", (req, res) => {
         },
     });
 });
+app.use(errorHandler); // Sempre por último!
+
 module.exports = app;
