@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const app = express();
 const cors = require("cors");
+const responseTime = require("./middlewares/responseTime");
 // ... todas as rotas acima ...
 // Middleware de rota não encontrada (sempre por último!)
 const notFound = require("./middlewares/notFound");
@@ -11,6 +12,7 @@ const notFound = require("./middlewares/notFound");
 app.use(express.json());
 app.use(cors());
 app.use(logger);
+app.use(responseTime);
 // Documentação Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const logger = require("./middlewares/logger");
