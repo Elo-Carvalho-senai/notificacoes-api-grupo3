@@ -1,71 +1,95 @@
 // src/controllers/ParticipanteController.js
 
 const ParticipanteModel = require("../models/ParticipanteModel");
+const { NotFoundError, ValidationError } = require("../errors/AppError");
 
 // LISTAR TODOS
-function index(req, res) {
-    const participantes = ParticipanteModel.listar();
-    res.json(participantes);
+function index(req, res, next) {
+    try {
+        const participantes = ParticipanteModel.listar();
+        res.json(participantes);
+    } catch (erro) {
+        next(erro);
+    }
 }
 
 // BUSCAR POR ID
-function show(req, res) {
-    const id = parseInt(req.params.id);
+function show(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
 
-    const participante = ParticipanteModel.buscarPorId(id);
+        const participante = ParticipanteModel.buscarPorId(id);
 
-    if (!participante) {
-        return res.status(404).json({ erro: "Participante não encontrado" });
+        if (!participante) {
+            throw new NotFoundError("Participante");
+        }
+
+        res.json(participante);
+    } catch (erro) {
+        next(erro);
     }
-
-    res.json(participante);
 }
 
 // CRIAR
-function store(req, res) {
-    const { nome, email } = req.body;
+function store(req, res, next) {
+    try {
+        const { nome, email } = req.body;
 
-    // Validação
-    if (!nome || !email) {
-        return res.status(400).json({ erro: "Nome e email são obrigatórios" });
+        // Validação obrigatória
+        if (!nome || !email) {
+            throw new ValidationError("Nome e email são obrigatórios");
+        }
+
+        // Validação extra
+        if (email && !email.includes("@")) {
+            throw new ValidationError("Email inválido");
+        }
+
+        const novoParticipante = ParticipanteModel.criar({ nome, email });
+
+        res.status(201).json(novoParticipante);
+    } catch (erro) {
+        next(erro);
     }
-
-    const novoParticipante = ParticipanteModel.criar({ nome, email });
-
-    res.status(201).json({
-        mensagem: "Participante criado com sucesso!",
-        participante: novoParticipante
-    });
 }
 
 // ATUALIZAR
-function update(req, res) {
-    const id = parseInt(req.params.id);
-    const { nome, email } = req.body;
+function update(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
 
-    const participanteAtualizado = ParticipanteModel.atualizar(id, { nome, email });
+        const { nome, email } = req.body;
 
-    if (!participanteAtualizado) {
-        return res.status(404).json({ erro: "Participante não encontrado" });
+        const participanteAtualizado = ParticipanteModel.atualizar(id, {
+            nome,
+            email
+        });
+
+        if (!participanteAtualizado) {
+            throw new NotFoundError("Participante");
+        }
+
+        res.json(participanteAtualizado);
+    } catch (erro) {
+        next(erro);
     }
-
-    res.json({
-        mensagem: "Participante atualizado com sucesso!",
-        participante: participanteAtualizado
-    });
 }
 
 // DELETAR
-function destroy(req, res) {
-    const id = parseInt(req.params.id);
+function destroy(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
 
-    const deletado = ParticipanteModel.deletar(id);
+        const deletado = ParticipanteModel.deletar(id);
 
-    if (!deletado) {
-        return res.status(404).json({ erro: "Participante não encontrado" });
+        if (!deletado) {
+            throw new NotFoundError("Participante");
+        }
+
+        res.status(204).send();
+    } catch (erro) {
+        next(erro);
     }
-
-    res.status(204).send(); // sem conteúdo
 }
 
 module.exports = { index, show, store, update, destroy };

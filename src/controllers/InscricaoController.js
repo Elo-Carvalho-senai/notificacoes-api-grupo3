@@ -1,4 +1,4 @@
-// src/controllers/InscricaoController.js 
+// src/controllers/InscricaoController.js
 
 const InscricaoModel = require("../models/InscricaoModel");
 const EventoModel = require("../models/EventoModel");
@@ -61,10 +61,6 @@ function store(req, res, next) {
             parseInt(eventoId),
             parseInt(participanteId)
         );
-
-        if (resultado?.erro) {
-            throw new ValidationError(resultado.erro);
-        }
 
         res.status(201).json(resultado);
     } catch (erro) {
