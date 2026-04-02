@@ -5,7 +5,7 @@ API de Notificações por E-mail para Plataforma de Eventos
 Desenvolver uma API REST que gerencie o envio de notificações por e-mail
 (confirmação de inscrição e lembretes) para participantes de eventos.
 ## 3. Justificativa
-[Por que este módulo é necessário? Que problema ele resolve?]
+O módulo automatiza a comunicação com os participantes, enviando confirmações e lembretes, evitando falhas manuais e aumentando o engajamento.
 ## 4. Escopo
 ### Incluído:
 - CRUD de Eventos, Participantes e Inscrições
@@ -19,13 +19,14 @@ Desenvolver uma API REST que gerencie o envio de notificações por e-mail
 ## 5. Equipe
 | Nome | Função/Responsabilidade |
 |------|------------------------|
-| [Membro 1] | [ex: Líder técnico, responsável pelo banco] |
-| [Membro 2] | [ex: Responsável pela documentação] |
-| [Membro 3] | [ex: Responsável pelos testes] |
+| [Maria Eloisa] | [Pode ser o responsável pelo banco de dados (Models  Migrations).] |
+| [Maria Fernanda] | [Pode focar na documentação técnica e Swagger.] |
+| [Raissa ] | [Pode ser o responsável pelos testes no Postman e qualidade.] |
+| [Isadora ] | [Responsável pela Infraestrutura, Configuração de E-mail e Deploy] |
 ## 6. Tecnologias
 Node.js, Express.js, MySQL, Sequelize, Swagger, Nodemailer, Git/GitHub
 ## 7. Prazo
-Início: [data] | Entrega final: [data da apresentação]
+Início: [02/04/2026 ] | Entrega final: [16/04/2026 ]
 ## 8. Critérios de Sucesso
 - [ ] API funcional com todos os CRUDs
 - [ ] Dados persistidos em MySQL
