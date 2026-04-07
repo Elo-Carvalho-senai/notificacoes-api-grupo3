@@ -51,6 +51,25 @@ src/
 | `npm run dev` | Inicia com Nodemon (desenvolvimento) |
 
 
+## 📊 Visão Geral da Arquitetura
+
+A aplicação segue uma arquitetura em camadas, separando responsabilidades em diferentes partes do sistema.
+
+### Camadas:
+
+- **Controller:** recebe requisições e retorna respostas
+- **Service:** contém regras de negócio e validações
+- **Model:** manipula os dados
+- **Routes:** define as rotas da API
+- **Helpers:** funções reutilizáveis (ex: validações, parseId)
+- **Errors:** tratamento de erros personalizados
+
+### Fluxo da aplicação:
+
+Request → Route → Controller → Service → Model → Response
+
+Essa estrutura facilita a organização, manutenção e escalabilidade do sistema.
+
 ## 🚀 Como Rodar
 1. Clone o repositório:
 ```bash
